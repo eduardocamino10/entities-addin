@@ -4,34 +4,90 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Looker Studio Add-in</title>
+    <style>
+        /* Resetear alto y ancho de la página cargada */
+        html, body {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            background-color: #f4f5f7;
+        }
+
+        /* Contenedor principal del Add-In */
+        #bimbo-entities-root {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100vh !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+        }
+
+        /* Estilos directos sobre el iframe de Looker Studio */
+        .full-screen-frame {
+            width: 100% !important;
+            height: 100% !important;
+            border: 0 !important;
+            display: block !important;
+        }
+    </style>
 </head>
 <body>
-    <div id="bimbo-entities-root" style="width:100%; margin:0; padding:0;">
-        <iframe
-            id="bimbo-looker-frame"
-            src="https://lookerstudio.google.com/embed/reporting/7158f3ba-71fd-4722-a58a-8941cb0fe03f/page/p_2gydgfcu5d"
-            style="display:block; width:100%; height:calc(100vh - 90px); border:0;"
-            allowfullscreen
+    <div id="bimbo-entities-root">
+        <iframe 
+            class="full-screen-frame"
+            src="https://lookerstudio.google.com/embed/reporting/7158f3ba-71fd-4722-a58a-8941cb0fe03f/page/p_2gydgfcu5d" 
+            allowfullscreen 
             sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
         </iframe>
     </div>
 
     <script>
-        geotab.addin.entitiesLooker = function (api, state) {
-            function ajustar() {
-                var f = document.getElementById('bimbo-looker-frame');
-                if (f) {
-                    var top = f.getBoundingClientRect().top;
-                    f.style.height = (window.innerHeight - top - 10) + 'px';
-                }
-            }
+        geotab.addin.bimboEntities = function (api, state) {
             return {
                 initialize: function (api, state, callback) {
-                    window.addEventListener('resize', ajustar);
+                    // Forzar la expansión del contenedor padre nativo de MyGeotab
+                    var el = document.getElementById('bimbo-entities-root');
+                    if (el && el.parentElement) {
+                        el.parentElement.style.width = '100%';
+                        el.parentElement.style.height = '100%';
+                        el.parentElement.style.padding = '0';
+                        el.parentElement.style.margin = '0';
+                    }
                     callback();
                 },
-                focus: function () { ajustar(); },
-                blur: function () {}
+                focus: function (api, state) {
+                    // Re-aplicar estilos cuando el usuario vuelve a la pestaña
+                    var el = document.getElementById('bimbo-entities-root');
+                    if (el && el.parentElement) {
+                        el.parentElement.style.width = '100%';
+                        el.parentElement.style.height = '100%';
+                    }
+                },
+                blur: function (api, state) {
+                }
+            };
+        };
+    </script>
+</body>
+</html>        geotab.addin.bimboEntities = function (api, state) {
+            return {
+                initialize: function (api, state, callback) {
+                    callback();
+                },
+                focus: function (api, state) {
+                    // Fuerza un reflow del iframe cuando el usuario entra al menú
+                    var iframe = document.querySelector('.full-screen-frame');
+                    if (iframe) {
+                        iframe.style.height = '100%';
+                    }
+                },
+                blur: function (api, state) {
+                }
             };
         };
     </script>
