@@ -57,6 +57,7 @@
                         el.parentElement.style.height = '100%';
                         el.parentElement.style.padding = '0';
                         el.parentElement.style.margin = '0';
+                        el.parameterElment.style.display = 'block'
                     }
                     callback();
                 },
@@ -66,6 +67,7 @@
                     if (el && el.parentElement) {
                         el.parentElement.style.width = '100%';
                         el.parentElement.style.height = '100%';
+                        el.parameterElment.style.display = 'block'
                     }
                 },
                 blur: function (api, state) {
